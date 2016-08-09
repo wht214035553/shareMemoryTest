@@ -64,8 +64,11 @@ int main(int argc, char **argv)
 			
 			//初始化两个信号量
 			semctl(semid, 0, SETVAL, sem_u);
-			semctl(semid, 1, SETVAL, sem_u);
-			
+		
+			//sleep(5);
+			//每个进程设置自己的信号量，否则存在覆盖的可能性
+			//semctl(semid, 1, SETVAL, sem_u);
+		
 			//获取共享内存
 			shmid = shmget(shmKey, 1024, 0666|IPC_CREAT);
 			if (shmid < 0)

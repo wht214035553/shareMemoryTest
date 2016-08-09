@@ -41,11 +41,11 @@ int main(int argc, char **argv)
 			ushort *array;
 		} sem_u;
 		
-		sem_u.val = 0;
-		semctl(semid, 0, SETVAL, sem_u);
+		//sem_u.val = 0;
+		//semctl(semid, 0, SETVAL, sem_u);
 		sem_u.val = 1;
 		semctl(semid, 1, SETVAL, sem_u);
-		
+
 		shmid = shmget(shmKey, 1024, 0666|IPC_CREAT);
 		if (shmid < 0)
 		{
