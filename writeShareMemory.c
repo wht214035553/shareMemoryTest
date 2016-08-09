@@ -72,7 +72,8 @@ int main(int argc, char **argv)
 			semop(semid, &sem_p, 1);
 
 			//strcpy(addr, "hello world");
-			sprintf((char *)addr, "hello %d", i);
+			sleep(1);
+			snprintf((char *)addr, 1024, "hello %d", i);
 			printf("write:%s\n", (char *)addr);
 
 			//v 0

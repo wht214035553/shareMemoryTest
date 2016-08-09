@@ -17,6 +17,8 @@ int main(int argc, char **argv)
 {
 	int ret = -1;
 	pid_t pid = 0;
+
+	//固定的字符串作为键值
 	char *semString = "semKey";
 	char *shmString = "shmKey";
 
@@ -31,30 +33,38 @@ int main(int argc, char **argv)
 	else
 	{
 		printf(">> readShareMemory\n");
+		
+		//利用固定的字符串生成key值
 		key_t semKey = ftok(semString, 0);
 		key_t shmKey = ftok(shmString, 0);
+		
 		int semid;
 		int shmid;
 		void *addr = NULL;
 
 		do
-		{	
+		{
+			//获取system v信号量
 			semid = semget(semKey, 2, 0666|IPC_CREAT);
 			if (semid < 0)
 			{
-				printf("semget failed\n");
+				printf("semget failed semid = %d\n", semid);
 				ret = semid;
 				break;
 			}
+			//信号量的初始值设为0
 			union semun {
 				int val;
 				struct semid_ds *buf;
 				ushort *array;
 			} sem_u;
 			sem_u.val = 0;
+			
+			//初始化两个信号量
 			semctl(semid, 0, SETVAL, sem_u);
 			semctl(semid, 1, SETVAL, sem_u);
 			
+			//获取共享内存
 			shmid = shmget(shmKey, 1024, 0666|IPC_CREAT);
 			if (shmid < 0)
 			{
@@ -63,6 +73,7 @@ int main(int argc, char **argv)
 				break;
 			}
 
+			//映射共享内存
 			addr = shmat(shmid, NULL, 0);
 			if ((void *)(-1) == addr)
 			{
@@ -73,7 +84,7 @@ int main(int argc, char **argv)
 			int i = 10;
 			while (i--)
 			{
-				//p 0
+				//p 0 第0个信号量减一
 				struct sembuf sem_p;
 				sem_p.sem_num = 0;
 				sem_p.sem_op = -1;
@@ -81,7 +92,7 @@ int main(int argc, char **argv)
 				
 				printf("read:%s\n", (char *)addr);
 
-				//v 1
+				//v 1 第一个信号量加一
 				struct sembuf sem_v;
 				sem_v.sem_num = 1;
 				sem_v.sem_op = 1;
@@ -89,11 +100,14 @@ int main(int argc, char **argv)
 			}
 		} while(0);
 
+		//删除信号量
 		semctl(semid, 0, IPC_RMID, 0);
+		//解除共享内存
 		shmdt(addr);
+		//删除共享内存
 		shmctl(shmid, IPC_RMID, NULL);
 		printf("<< readShareMemory\n");
-		sleep(1);
+		//sleep(1);
 		return ret;	
 	}
 
