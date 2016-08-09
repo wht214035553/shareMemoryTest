@@ -16,8 +16,8 @@
 int main(int argc, char **argv)
 {
 	int ret = -1;
-	char *semString = "semKey";
-	char *shmString = "shmKey";
+	char *semString = "ftok.keyfile";
+	char *shmString = "ftok.keyfile";
 
 	key_t semKey = ftok(semString, 0);
 	key_t shmKey = ftok(shmString, 0);

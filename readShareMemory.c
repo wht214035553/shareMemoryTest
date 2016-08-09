@@ -19,8 +19,8 @@ int main(int argc, char **argv)
 	pid_t pid = 0;
 
 	//固定的字符串作为键值
-	char *semString = "semKey";
-	char *shmString = "shmKey";
+	char *semString = "./ftok.keyfile";
+	char *shmString = "./ftok.keyfile";
 
 	pid = fork();
 	if(pid == 0)
@@ -37,7 +37,9 @@ int main(int argc, char **argv)
 		//利用固定的字符串生成key值
 		key_t semKey = ftok(semString, 0);
 		key_t shmKey = ftok(shmString, 0);
-		
+
+		printf("semKey : %d\n", semKey);
+
 		int semid;
 		int shmid;
 		void *addr = NULL;
